@@ -1,0 +1,26 @@
+version: '3'
+
+services:
+  ace_laser_fatt_app:
+    build:
+      dockerfile: Dockerfile
+    image: ace_laser_fatt_app:dev
+    command: python3 -m laserGui
+    user: $UID_GID
+    working_dir: /code/
+    environment:
+      DISPLAY: "$IP:0"
+      LASERGUI_ROOT: /code
+      LASERGUI_MOCK: true
+      LASERGUI_DEBUG: true
+      ACE_ACCESS_URL: None
+      ACE_EXPORT_TOKEN: None
+      ACEGC_ASSET_ID: None
+      ACEGC_ASSET_TOKEN: None
+      ACEGC_BASE_URL: None
+      ACEGC_LASER_COST: "0.5"
+      LASER_LOGOUT_TIME: "40"
+      LASER_ODO_POLLING: "15"
+      LASERGUI_SYNC_BUTTON: false
+    volumes:
+      - /tmp/.X11-unix:/tmp/.X11-unix
