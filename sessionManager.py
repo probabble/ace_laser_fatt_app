@@ -1,3 +1,4 @@
+import logging
 from datetime import datetime
 from enum import Enum
 from filter import Filter, FilterType
@@ -9,7 +10,7 @@ import json
 import requests
 import sys
 
-AUTHLIST_FILE = "authorized.json"
+AUTHLIST_FILE = "authorized.json.dev"
 
 # Global Variables ----
 class Auth_Result(Enum):
@@ -208,9 +209,14 @@ class SessionManager:
         }
         headers = {'Authorization': "Token {}".format(GC_ASSET_TOKEN)}
         #TODO: wrap request in a try
-        resp = requests.post(reporting_URL, data, headers=headers)
-        #print(resp.content)
-        return resp
+        #TODO: Don't allow the laser to be used if we can't connect to the asset system
+        try:
+            return requests.post(reporting_URL, data, headers=headers)
+        except Exception as e:
+            logging.getLogger(__name__).warning("Error in PostActivityListing", e)
+
+        # #print(resp.content)
+        # return resp
 
     def postLaserSession(self,currSession):
         print('posting LaserSession for '+ currSession.credential)

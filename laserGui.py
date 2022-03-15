@@ -1,5 +1,7 @@
 import os
+import tkinter
 from datetime import datetime, timedelta
+from guizero.event import EventData
 from filter import Filter, FilterType
 from guizero import App, Box, Picture, PushButton, Text, tkmixins
 from sessionManager import Auth_Result, SessionManager
@@ -33,7 +35,7 @@ def updateTime():
     dateTimeText.value = nowStr
 
 def updateSyncTime():
-    syncTime =sessionManager.get_auth_list_time()
+    syncTime = sessionManager.get_auth_list_time()
     syncTimeText.value = "Last update: "+ syncTime.strftime( "%b %d, %I:%M %p")
 
 def checkAuthCurrent():
@@ -261,11 +263,27 @@ Text(welcomeBox, text="Tap your fob to begin", size=36)
 syncTimeText = Text(welcomeBox, text="Last update:", size=12 )
 updateSyncTime()
 
+def create_debug_login():
+    """
+    log in the default demo user so that screens can be seen in development.
+
+    do this by generating an event like the one sent by the FOB reader, after
+    manipulating the global taggedFob to match the fob of the demo user
+    """
+    global taggedFob
+    taggedFob = '00000'
+    fakeLastCharOfFob = tkinter.Event()
+    fakeLastCharOfFob.keycode = 36
+    handleFobTag(EventData(None, fakeLastCharOfFob))
+
 # Optionally, show a force sync button
 if 'LASERGUI_SYNC_BUTTON' in os.environ:
     btnSyncNow = PushButton( welcomeBox, command=syncAuthList, text="Sync Now", width=10, pady=12 )
     btnSyncNow.highlightbackground = "blue"
-
+# Optionally, show demo login button
+if os.getenv('LASERGUI_DEBUG').lower() == 'true':
+    btnSyncNow = PushButton( welcomeBox, command=create_debug_login, text="Debug", width=10, pady=12 )
+    btnSyncNow.highlightbackground = "pink"
 
 # UNCERTIFIED State
 noCertBox = Box(app, align="top", width="fill", visible=False)
